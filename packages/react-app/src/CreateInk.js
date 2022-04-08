@@ -589,6 +589,37 @@ export default function CreateInk(props) {
     }
   };
 
+  const drawFrame = (color, radius) => {
+    let width = drawingCanvas.current.props.canvasWidth/2;
+    let height = drawingCanvas.current.props.canvasHeight/2;
+
+    drawingCanvas.current.lines.push({
+      brushColor: color,
+      brushRadius: radius,
+      // points: [
+      //   { x: 0, y: 0 },
+      //   { x: width, y: 0 },
+      //   { x: width, y: 0 },
+      //   { x: width, y: height },
+      //   { x: width, y: height },
+      //   { x: 0, y: height },
+      //   { x: 0, y: height },
+      //   { x: 0, y: 0 }
+      // ]
+      points: [
+        { x: width, y: 0 },
+        { x: width, y: 0 },
+        { x: 0, y: height },
+        { x: 0, y: height },
+        { x: width, y: 2*height },
+        { x: width, y: 2*height },
+        { x: 2*width, y: height },
+        { x: 2*width, y: height },
+        { x: width, y: 0 },
+        { x: width, y: 0 },
+      ]
+    });
+
   const downloadCanvas = async () => {
     const myData = drawingCanvas.current.getSaveData(); //drawingCanvas.current.lines; // I am assuming that "this.state.myData"
     // is an object and I wrote it to file as
@@ -1015,6 +1046,32 @@ export default function CreateInk(props) {
         saveDrawing(drawingCanvas.current, false);
       }
     };
+
+    if(drawingCanvas.current && imgData === false){   
+      // fetch once canvas data     
+      imgData = drawingCanvas.current.ctx.drawing.getImageData(0,0,drawingCanvas.current.props.canvasWidth,drawingCanvas.current.props.canvasHeight);
+      console.log(imgData);
+    }
+    
+    const handleMouseMove = (e) => {
+      //console.log(e);
+      setMousePosition({left: e.pageX, top: e.pageY});
+      console.log(MousePosition);
+      console.log(drawingCanvas);
+      //var imageData = drawingCanvas.current.ctx.drawing.getImageData(MousePosition.left,MousePosition.top,1,1);
+      let x = MousePosition.left;
+      let y = MousePosition.top;
+  
+      let index = (y * imgData.width + x) * 4;
+  
+      let red = imgData.data[index];
+      let green = imgData.data[index+1];
+      let blue = imgData.data[index+2];
+      let alpha = imgData.data[index+3];
+     // Output
+      console.log('pix x ' + x +' y '+y+ ' index '+index +' COLOR '+red+','+green+','+blue+','+alpha);
+      console.log("image",imgData);
+    }
 
     canvas = (
       <div
